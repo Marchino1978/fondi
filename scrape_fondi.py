@@ -72,9 +72,9 @@ def main():
             data = get_price(url.strip(), nome.strip())
             results.append(data)
 
-    # scrive output
+    # scrive output con separatore ;
     with open("fondi_nav.csv", "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
+        writer = csv.writer(f, delimiter=";")
         writer.writerow(["nome", "price"])
         for r in results:
             writer.writerow([r["nome"], r["price"]])
