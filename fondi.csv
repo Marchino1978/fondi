@@ -1,13 +1,11 @@
 nome,url
-# --- TITOLI ---
 Eurizon Next 2.0 - Strategia Conservativa ST,https://www.eurizoncapital.com/it-IT/offerta/prodotti/prodotti/eurizon-next-strategia-conservativa-st
 Eurizon Next 2.0 - Diversificato 70 G,https://www.eurizoncapital.com/it-IT/offerta/prodotti/prodotti/eurizon-next---allocazione-diversificata-70-g
 Eurizon Azioni America,https://www.eurizoncapital.com/it-IT/offerta/prodotti/prodotti/eurizon-azioni-america
-# --- CERTIFICATES ---
-IS EP CP EURO STOXX Banks 82.124 300627,https://www.borsaitaliana.it/borsa/cw-e-certificates/scheda/XS2480901110.html?lang=it
-IS BON CAP STELLANTIS 17.3844 55 130927,https://www.borsaitaliana.it/borsa/cw-e-certificates/scheda/XS2651529708.html?lang=it
-IS CC VOLKSWAGEN PREF 114.32 55 310528,https://www.borsaitaliana.it/borsa/cw-e-certificates/scheda/XS2803386726.html?lang=it
-IS BON CAP AIRBUS 152.954 55 310528,https://www.borsaitaliana.it/borsa/cw-e-certificates/scheda/XS2803386056.html?lang=it
-IS EP CP EURIBOR 3M .0195 291128,https://www.borsaitaliana.it/borsa/cw-e-certificates/scheda/XS2922665703.html?lang=it
-IS CC PUMA/ADIDAS/DK/VF/NIKE 60 310128,https://www.borsaitaliana.it/borsa/cw-e-certificates/scheda/XS2733100296.html?lang=it
-IS BON CAP AMAZON INC 207.84 55 291128,https://www.borsaitaliana.it/borsa/cw-e-certificates/scheda/XS2922658328.html?lang=it
+Is Ep Cp Euro Stoxx Banks 82.124 300627,https://www.teleborsa.it/sedex-securitised-derivates/is-ep-cp-euro-stoxx-banks-82-124-300627-i08396-xs2480901110-WFMyNDgwOTAxMTEw
+Is Bon Cap Stellantis 17.3844 55 130927,https://www.teleborsa.it/sedex-securitised-derivates/is-bon-cap-stellantis-17-3844-55-130927-i09512-xs2651529708-WFMyNjUxNTI5NzA4
+Is Cc Volkswagen Pref 114.32 55 310528,https://www.teleborsa.it/sedex-securitised-derivates/is-cc-volkswagen-pref-114-32-55-310528-i10147-xs2803386726-WFMyODAzMzg2NzI2
+Is Bon Cap Airbus 152.954 55 310528,https://www.teleborsa.it/sedex-securitised-derivates/is-bon-cap-airbus-152-954-55-310528-i10146-xs2803386056-WFMyODAzMzg2MDU2
+Is Ep Cp Euribor 3M .0195 291128,https://www.teleborsa.it/sedex-securitised-derivates/is-ep-cp-euribor-3m-0195-291128-i10560-xs2922665703-WFMyOTIyNjY1NzAz
+Is Cc Puma/Adidas/Dk/Vf/Nike 60 310128,https://www.teleborsa.it/sedex-securitised-derivates/is-cc-puma-adidas-dk-vf-nike-60-310128-i09770-xs2733100296-WFMyNzMzMTAwMjk2
+Is Bon Cap Amazon Inc 207.84 55 291128,https://www.teleborsa.it/sedex-securitised-derivates/is-bon-cap-amazon-inc-207-84-55-291128-i10555-xs2922658328-WFMyOTIyNjU4MzI4
