@@ -30,7 +30,7 @@ jobs:
       - name: Run scraping script
         run: python scrape_fondi.py
 
-      - name: Commit and push updated CSV
+      - name: Pull and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -38,4 +38,4 @@ jobs:
           git commit -m "Aggiornamento automatico NAV fondi" || echo "No changes to commit"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Marchino1978/fondi.git
           git pull --rebase origin main
-          git push origin HEAD:main
+          git push origin main
