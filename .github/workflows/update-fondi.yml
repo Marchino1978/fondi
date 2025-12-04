@@ -1,54 +1,96 @@
-name: Aggiorna fondi NAV
+- name: Set up Python
+    uses: actions/setup-python@v4
+    with:
+      python-version: '3.x'
 
-on:
-  schedule:
-    - cron: '0 8 * * *'   # ogni giorno alle 08:00 UTC (09:00 ora italiana)
-  workflow_dispatch:       # permette di avviare manualmente dal tab Actions
+  - name: Install dependencies
+    run: |
+      python -m pip install --upgrade pip
+      if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-jobs:
-  update:
-    runs-on: ubuntu-latest
+  - name: Run update script
+    # Replace this with the actual command that updates NAV/fondi in the repo
+    run: |
+      # example: python update_fondi.py
+      # exit non-zero on failure so workflow fails in a visible way
+      if [ -f scripts/update_fondi.py ]; then
+        python scripts/update_fondi.py
+      elif [ -f update_fondi.py ]; then
+        python update_fondi.py
+      else
+        echo "No update script found; nothing to run."
+      fi
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  - name: Configure git author
+    run: |
+      git config user.name "github-actions[bot]"
+      git config user.email "actions@github.com"
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+  - name: Exit if no changes
+    id: changes
+    run: |
+      if [ -n "$(git status --porcelain)" ]; then
+        echo "changes=true" >> $GITHUB_OUTPUT
+      else
+        echo "changes=false" >> $GITHUB_OUTPUT
+      fi
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+  - name: Prepare commit (stage changes)
+    if: steps.changes.outputs.changes == 'true'
+    run: |
+      git add -A
+      # only create a commit if there are staged changes
+      if git diff --cached --quiet; then
+        echo "No staged changes to commit"
+      else
+        git commit -m "Aggiornamento automatico NAV fondi"
+      fi
 
-      - name: Run scraping script
-        run: python scrape_fondi.py
+  - name: Sync with remote and push (rebase, retry on race)
+    if: steps.changes.outputs.changes == 'true'
+    env:
+      GIT_RETRY_MAX: 3
+    run: |
+      set -euo pipefail
+      RETRIES=0
+      while [ $RETRIES -lt "$GIT_RETRY_MAX" ]; do
+        # fetch the latest main and attempt to rebase local HEAD on it
+        git fetch origin main
+        # ensure main exists locally
+        if git show-ref --verify --quiet refs/heads/main; then
+          BASE_BRANCH=main
+        else
+          BASE_BRANCH=refs/remotes/origin/main
+        fi
 
-      - name: Commit and push updated CSV
-        env:
-          REPO: Marchino1978/fondi
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add fondi_nav.csv
-
-          # If there are no staged changes, exit successfully (nothing to push)
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
+        # Try rebase with autostash to avoid local-workspace conflicts
+        if git rebase origin/main --autostash; then
+          if git push origin HEAD:main; then
+            echo "Push succeeded"
             exit 0
           fi
+        else
+          # rebase failed (likely conflict). Abort and try merge as fallback.
+          git rebase --abort || true
+          echo "Rebase failed — attempting merge fallback"
+          if git merge --no-edit origin/main; then
+            if git push origin HEAD:main; then
+              echo "Push succeeded after merge fallback"
+              exit 0
+            fi
+          else
+            echo "Merge fallback failed"
+          fi
+        fi
 
-          git commit -m "Aggiornamento automatico NAV fondi"
+        RETRIES=$((RETRIES + 1))
+        echo "Push attempt $RETRIES failed; retrying after fetch/rebase"
+        sleep 3
+      done
 
-          # Ensure we have remote updates, rebase our commit onto latest remote main, then push using the token
-          git fetch origin main
-          git rebase origin/main
+      echo "Failed to push changes after ${GIT_RETRY_MAX} attempts"
+      exit 1
 
-          git push "https://x-access-token:${TOKEN}@github.com/${REPO}.git" HEAD:main
+  - name: No changes to push
+    if: steps.changes.outputs.changes == 'false'
+    run: echo "No updates detected; nothing to commit or push."
