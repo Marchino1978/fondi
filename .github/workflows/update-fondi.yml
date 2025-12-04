@@ -2,16 +2,20 @@ name: Aggiorna fondi NAV
 
 on:
   schedule:
-    - cron: '0 8 * * *'   # ogni giorno alle 08:00 UTC (09:00 ora italiana)
+    - cron: '0 9 * * *'   # ogni giorno alle 09:00 UTC (10:00 ora italiana)
   workflow_dispatch:       # permette di avviare manualmente dal tab Actions
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -29,7 +33,7 @@ jobs:
       - name: Commit and push updated CSV
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add fondi_nav.csv
-          git commit -m "Aggiornamento automatico NAV fondi"
+          git commit -m "Aggiornamento automatico NAV fondi" || echo "No changes to commit"
           git push
