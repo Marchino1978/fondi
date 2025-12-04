@@ -37,4 +37,5 @@ jobs:
           git add fondi_nav.csv
           git commit -m "Aggiornamento automatico NAV fondi" || echo "No changes to commit"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Marchino1978/fondi.git
+          git pull --rebase origin main
           git push origin HEAD:main
