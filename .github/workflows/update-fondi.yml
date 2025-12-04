@@ -36,7 +36,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B data-feed origin/data-feed
+          git checkout -B data-feed
           git pull --rebase origin data-feed || true
           git add fondi_nav.csv
           git commit -m "Aggiornamento automatico NAV fondi" || echo "No changes to commit"
