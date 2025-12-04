@@ -2,7 +2,7 @@ name: Aggiorna fondi NAV
 
 on:
   schedule:
-    - cron: '0 9 * * *'   # ogni giorno alle 09:00 UTC (10:00 ora italiana)
+    - cron: '0 20 * * *'   # ogni giorno alle 09:00 UTC (10:00 ora italiana)
   workflow_dispatch:       # permette di avviare manualmente dal tab Actions
 
 jobs:
