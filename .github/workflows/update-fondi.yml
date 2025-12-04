@@ -10,11 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python
@@ -30,12 +32,21 @@ jobs:
       - name: Run scraping script
         run: python scrape_fondi.py
 
-      - name: Pull and push changes
+      - name: Commit changes to data-feed branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B data-feed
           git add fondi_nav.csv
           git commit -m "Aggiornamento automatico NAV fondi" || echo "No changes to commit"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Marchino1978/fondi.git
-          git pull --rebase origin main
-          git push origin main
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Marchino1978/fondi.git data-feed
+
+      - name: Create or update Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: data-feed
+          base: main
+          title: "Aggiornamento automatico NAV fondi"
+          body: "Aggiorna fondi_nav.csv dal workflow giornaliero"
+          commit-message: "Aggiornamento automatico NAV fondi"
