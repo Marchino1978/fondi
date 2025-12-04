@@ -2,7 +2,7 @@ name: Aggiorna fondi NAV
 
 on:
   schedule:
-    - cron: '0 9 * * *'   # ogni giorno alle 09:00 UTC (10:00 ora italiana)
+    - cron: '0 8 * * *'   # ogni giorno alle 08:00 UTC (09:00 ora italiana)
   workflow_dispatch:       # permette di avviare manualmente dal tab Actions
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
 
           git commit -m "Aggiornamento automatico NAV fondi"
 
-          # Forza il push, sovrascrivendo il branch remoto
+          # Push forzato: sovrascrive sempre il branch remoto
           git push --force https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Marchino1978/fondi.git data-feed
 
       - name: Create or update Pull Request
