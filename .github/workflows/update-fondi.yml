@@ -33,9 +33,8 @@ jobs:
       - name: Pull and push changes
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add fondi_nav.csv
-          git commit -m "Aggiornamento automatico NAV fondi" || echo "No changes to commit"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Marchino1978/fondi.git
+          git commit -m "Aggiornamento automatico NAV fondi"
           git pull --rebase origin main
-          git push origin main
+          git push
