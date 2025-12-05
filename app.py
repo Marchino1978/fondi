@@ -32,7 +32,7 @@ def commit_csv_to_github():
 
     # Endpoint API GitHub per il file
     api_url = f"https://api.github.com/repos/{GH_REPO}/contents/{FILE_PATH}"
-    headers = {"Authorization": f"Bearer {GH_TOKEN}"}
+    headers = {"Authorization": f"token {GH_TOKEN}"}  # 🔧 aggiornato
 
     # Recupera SHA del file se già esiste
     r = requests.get(api_url, headers=headers, params={"ref": GH_BRANCH})
