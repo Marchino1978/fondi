@@ -1,20 +1,68 @@
-# app.py
 from flask import Flask, jsonify
 import subprocess
 import os
+import base64
+import requests
 
 app = Flask(__name__)
 
+# Endpoint di healthcheck per Render
 @app.get("/healthz")
 def healthz():
-  return jsonify({"status": "ok"})
+    return jsonify({"status": "ok"})
 
-@app.post("/update-fondi")
+# Endpoint di keep-alive (ping leggero per UptimeRobot)
+@app.get("/ping")
+def ping():
+    return "pong", 200
+
+# Funzione per fare commit automatico su GitHub
+def commit_csv_to_github():
+    GH_TOKEN = os.environ.get("GH_TOKEN")  # PAT GitHub
+    GH_REPO = os.environ.get("GH_REPO", "Marchino1978/fondi")  # repo target
+    GH_BRANCH = os.environ.get("GH_BRANCH", "main")            # branch target
+    FILE_PATH = "fondi_nav.csv"
+
+    # Legge il contenuto del CSV
+    with open(FILE_PATH, "rb") as f:
+        content = base64.b64encode(f.read()).decode("utf-8")
+
+    # Endpoint API GitHub per il file
+    api_url = f"https://api.github.com/repos/{GH_REPO}/contents/{FILE_PATH}"
+    headers = {"Authorization": f"Bearer {GH_TOKEN}"}
+
+    # Recupera SHA del file se già esiste
+    r = requests.get(api_url, headers=headers, params={"ref": GH_BRANCH})
+    sha = r.json().get("sha") if r.status_code == 200 else None
+
+    # Corpo della richiesta PUT
+    body = {
+        "message": "Aggiornamento automatico NAV fondi",
+        "content": content,
+        "branch": GH_BRANCH,
+    }
+    if sha:
+        body["sha"] = sha
+
+    # Commit su GitHub
+    resp = requests.put(api_url, headers=headers, json=body)
+    resp.raise_for_status()
+    print("✅ Commit su GitHub completato")
+
+# Endpoint per aggiornare i fondi
+@app.route("/update-fondi", methods=["GET", "POST"])
 def update_fondi():
-  try:
-    # Esegue lo script di scraping
-    subprocess.check_call(["python", "scrape_fondi.py"])
-    # Opzionale: salva output in una cartella pubblica o invia commit a GitHub (vedi sotto)
-    return jsonify({"status": "updated"}), 200
-  except subprocess.CalledProcessError as e:
-    return jsonify({"status": "error", "detail": str(e)}), 500
+    try:
+        # esegue lo script di scraping
+        subprocess.check_call(["python", "scrape_fondi.py"])
+        # commit automatico su GitHub
+        commit_csv_to_github()
+        return jsonify({"status": "updated"}), 200
+    except subprocess.CalledProcessError as e:
+        return jsonify({"status": "error", "detail": str(e)}), 500
+    except Exception as e:
+        return jsonify({"status": "error", "detail": str(e)}), 500
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
