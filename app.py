@@ -1,8 +1,11 @@
 from flask import Flask, jsonify
-import subprocess
 import os
 import base64
 import requests
+
+# Import diretto della logica di scraping
+# Assicurati che in scrape_fondi.py ci sia una funzione main()
+from scrape_fondi import main as scrape_fondi_main
 
 app = Flask(__name__)
 
@@ -58,14 +61,11 @@ def commit_csv_to_github():
 @app.route("/update-fondi", methods=["GET", "POST"])
 def update_fondi():
     try:
-        # esegue lo script di scraping
-        subprocess.check_call(["python", "scrape_fondi.py"])
+        # esegue direttamente la logica di scraping
+        scrape_fondi_main()
         # commit automatico su GitHub
         commit_csv_to_github()
         return jsonify({"status": "updated"}), 200
-    except subprocess.CalledProcessError as e:
-        print("Errore scraping:", str(e))
-        return jsonify({"status": "error", "detail": str(e)}), 500
     except Exception as e:
         print("Errore in /update-fondi:", str(e))
         return jsonify({"status": "error", "detail": str(e)}), 500
