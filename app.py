@@ -46,6 +46,11 @@ def commit_csv_to_github():
 
     # Commit su GitHub
     resp = requests.put(api_url, headers=headers, json=body)
+
+    # 👇 Debug: stampa nei log di Render
+    print("GitHub response status:", resp.status_code)
+    print("GitHub response body:", resp.text)
+
     resp.raise_for_status()
     print("✅ Commit su GitHub completato")
 
@@ -61,6 +66,8 @@ def update_fondi():
     except subprocess.CalledProcessError as e:
         return jsonify({"status": "error", "detail": str(e)}), 500
     except Exception as e:
+        # 👇 Debug: mostra l'errore nei log
+        print("Errore in /update-fondi:", str(e))
         return jsonify({"status": "error", "detail": str(e)}), 500
 
 if __name__ == "__main__":
