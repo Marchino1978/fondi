@@ -7,12 +7,12 @@ import requests
 app = Flask(__name__)
 
 # Endpoint di healthcheck per Render
-@app.get("/healthz")
+@app.route("/healthz", methods=["GET"])
 def healthz():
     return jsonify({"status": "ok"})
 
 # Endpoint di keep-alive (ping leggero per UptimeRobot)
-@app.get("/ping")
+@app.route("/ping", methods=["GET"])
 def ping():
     return "pong", 200
 
@@ -64,9 +64,9 @@ def update_fondi():
         commit_csv_to_github()
         return jsonify({"status": "updated"}), 200
     except subprocess.CalledProcessError as e:
+        print("Errore scraping:", str(e))
         return jsonify({"status": "error", "detail": str(e)}), 500
     except Exception as e:
-        # 👇 Debug: mostra l'errore nei log
         print("Errore in /update-fondi:", str(e))
         return jsonify({"status": "error", "detail": str(e)}), 500
 
