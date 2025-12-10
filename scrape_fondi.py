@@ -83,7 +83,7 @@ def normalize(value_it):
 # Main
 # -----------------------------
 def main():
-    # Legge lista fondi da CSV
+    # Legge lista fondi da CSV (nome,url,ISIN)
     with open("fondi.csv", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fondi = list(reader)
@@ -91,12 +91,13 @@ def main():
     # Inizializza output
     with open("fondi_nav.csv", "w", newline="", encoding="utf-8") as f_out:
         writer = csv.writer(f_out, delimiter=";")
-        writer.writerow(["timestamp", "nome", "nav_text_it", "nav_float"])
+        writer.writerow(["timestamp", "nome", "ISIN", "nav_text_it", "nav_float"])
 
     # Loop sui fondi
     for fondo in fondi:
         nome = fondo["nome"].strip()
         url = fondo["url"].strip()
+        isin = fondo.get("ISIN", "").strip()  # può essere vuoto o "IT"
         try:
             html = fetch_html(url)
             if not html:
@@ -112,13 +113,19 @@ def main():
             nav_float = normalize(nav_text)
             with open("fondi_nav.csv", "a", newline="", encoding="utf-8") as f_out:
                 writer = csv.writer(f_out, delimiter=";")
-                writer.writerow([datetime.now().isoformat(), nome, nav_text or "N/D", nav_float or "N/D"])
-            print(f"{nome}: {nav_text or 'N/D'}")
+                writer.writerow([
+                    datetime.now().isoformat(),
+                    nome,
+                    isin,
+                    nav_text or "N/D",
+                    nav_float or "N/D"
+                ])
+            print(f"{nome} ({isin}): {nav_text or 'N/D'}")
         except Exception as e:
             with open("fondi_nav.csv", "a", newline="", encoding="utf-8") as f_out:
                 writer = csv.writer(f_out, delimiter=";")
-                writer.writerow([datetime.now().isoformat(), nome, "ERRORE", ""])
-            print(f"{nome}: errore {repr(e)}")
+                writer.writerow([datetime.now().isoformat(), nome, isin, "ERRORE", ""])
+            print(f"{nome} ({isin}): errore {repr(e)}")
 
 if __name__ == "__main__":
     main()
