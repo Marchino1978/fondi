@@ -3,7 +3,7 @@ from flask import Flask, jsonify
 import os
 import base64
 import requests
-from scrape_fondi import main as scrape_fondi_main
+from src.scrape_fondi import main as scrape_fondi_main   # aggiornato
 
 app = Flask(__name__)
 
@@ -19,7 +19,7 @@ def commit_csv_to_github():
     GH_TOKEN = os.environ.get("GH_TOKEN")
     GH_REPO = os.environ.get("GH_REPO", "Marchino1978/fondi")
     GH_BRANCH = os.environ.get("GH_BRANCH", "main")
-    FILE_PATH = "fondi_nav.csv"
+    FILE_PATH = "data/fondi_nav.csv"   # aggiornato
 
     with open(FILE_PATH, "rb") as f:
         content = base64.b64encode(f.read()).decode("utf-8")

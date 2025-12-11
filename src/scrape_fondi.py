@@ -84,12 +84,12 @@ def normalize(value_it):
 # -----------------------------
 def main():
     # Legge lista fondi da CSV (nome,url,ISIN)
-    with open("fondi.csv", newline="", encoding="utf-8") as f:
+    with open("data/fondi.csv", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fondi = list(reader)
 
     # Inizializza output
-    with open("fondi_nav.csv", "w", newline="", encoding="utf-8") as f_out:
+    with open("data/fondi_nav.csv", "w", newline="", encoding="utf-8") as f_out:
         writer = csv.writer(f_out, delimiter=";")
         writer.writerow(["timestamp", "nome", "ISIN", "nav_text_it", "nav_float"])
 
@@ -111,7 +111,7 @@ def main():
                 nav_text = None
 
             nav_float = normalize(nav_text)
-            with open("fondi_nav.csv", "a", newline="", encoding="utf-8") as f_out:
+            with open("data/fondi_nav.csv", "a", newline="", encoding="utf-8") as f_out:
                 writer = csv.writer(f_out, delimiter=";")
                 writer.writerow([
                     datetime.now().isoformat(),
@@ -122,7 +122,7 @@ def main():
                 ])
             print(f"{nome} ({isin}): {nav_text or 'N/D'}")
         except Exception as e:
-            with open("fondi_nav.csv", "a", newline="", encoding="utf-8") as f_out:
+            with open("data/fondi_nav.csv", "a", newline="", encoding="utf-8") as f_out:
                 writer = csv.writer(f_out, delimiter=";")
                 writer.writerow([datetime.now().isoformat(), nome, isin, "ERRORE", ""])
             print(f"{nome} ({isin}): errore {repr(e)}")
