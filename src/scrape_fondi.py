@@ -3,10 +3,20 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
+import os
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0"
 }
+
+# -----------------------------
+# Percorsi robusti
+# -----------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "../data")
+
+fondi_path = os.path.join(DATA_DIR, "fondi.csv")
+fondi_nav_path = os.path.join(DATA_DIR, "fondi_nav.csv")
 
 # -----------------------------
 # Fetch HTML con gestione errori
@@ -84,12 +94,12 @@ def normalize(value_it):
 # -----------------------------
 def main():
     # Legge lista fondi da CSV (nome,url,ISIN)
-    with open("data/fondi.csv", newline="", encoding="utf-8") as f:
+    with open(fondi_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fondi = list(reader)
 
     # Inizializza output
-    with open("data/fondi_nav.csv", "w", newline="", encoding="utf-8") as f_out:
+    with open(fondi_nav_path, "w", newline="", encoding="utf-8") as f_out:
         writer = csv.writer(f_out, delimiter=";")
         writer.writerow(["timestamp", "nome", "ISIN", "nav_text_it", "nav_float"])
 
@@ -111,7 +121,7 @@ def main():
                 nav_text = None
 
             nav_float = normalize(nav_text)
-            with open("data/fondi_nav.csv", "a", newline="", encoding="utf-8") as f_out:
+            with open(fondi_nav_path, "a", newline="", encoding="utf-8") as f_out:
                 writer = csv.writer(f_out, delimiter=";")
                 writer.writerow([
                     datetime.now().isoformat(),
@@ -122,7 +132,7 @@ def main():
                 ])
             print(f"{nome} ({isin}): {nav_text or 'N/D'}")
         except Exception as e:
-            with open("data/fondi_nav.csv", "a", newline="", encoding="utf-8") as f_out:
+            with open(fondi_nav_path, "a", newline="", encoding="utf-8") as f_out:
                 writer = csv.writer(f_out, delimiter=";")
                 writer.writerow([datetime.now().isoformat(), nome, isin, "ERRORE", ""])
             print(f"{nome} ({isin}): errore {repr(e)}")
