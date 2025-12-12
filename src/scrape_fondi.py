@@ -97,37 +97,34 @@ def main():
     fondi = []
     with open(fondi_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        # Normalizza intestazioni (rimuove spazi e BOM)
         reader.fieldnames = [fn.strip().lstrip("\ufeff") for fn in reader.fieldnames]
         for row in reader:
             clean_row = {k.strip(): (v.strip() if isinstance(v, str) else "") for k, v in row.items()}
             fondi.append(clean_row)
 
-    # Inizializza output
+    # Scrive output una sola volta (sovrascrive ogni run)
     with open(fondi_nav_path, "w", newline="", encoding="utf-8") as f_out:
         writer = csv.writer(f_out, delimiter=";")
         writer.writerow(["timestamp", "nome", "ISIN", "nav_text_it", "nav_float"])
 
-    # Loop sui fondi
-    for fondo in fondi:
-        nome = fondo.get("nome", "")
-        url = fondo.get("url", "")
-        isin = fondo.get("ISIN", "")
-        try:
-            html = fetch_html(url)
-            if not html:
-                raise ValueError("HTML non disponibile")
+        # Loop sui fondi
+        for fondo in fondi:
+            nome = fondo.get("nome", "")
+            url = fondo.get("url", "")
+            isin = fondo.get("ISIN", "")
+            try:
+                html = fetch_html(url)
+                if not html:
+                    raise ValueError("HTML non disponibile")
 
-            if "eurizoncapital.com" in url:
-                nav_text = parse_eurizon(html)
-            elif "teleborsa.it" in url:
-                nav_text = parse_teleborsa(html)
-            else:
-                nav_text = None
+                if "eurizoncapital.com" in url:
+                    nav_text = parse_eurizon(html)
+                elif "teleborsa.it" in url:
+                    nav_text = parse_teleborsa(html)
+                else:
+                    nav_text = None
 
-            nav_float = normalize(nav_text)
-            with open(fondi_nav_path, "a", newline="", encoding="utf-8") as f_out:
-                writer = csv.writer(f_out, delimiter=";")
+                nav_float = normalize(nav_text)
                 writer.writerow([
                     datetime.now().isoformat(),
                     nome,
@@ -135,12 +132,10 @@ def main():
                     nav_text or "N/D",
                     nav_float or "N/D"
                 ])
-            print(f"{nome} ({isin}): {nav_text or 'N/D'}")
-        except Exception as e:
-            with open(fondi_nav_path, "a", newline="", encoding="utf-8") as f_out:
-                writer = csv.writer(f_out, delimiter=";")
+                print(f"{nome} ({isin}): {nav_text or 'N/D'}")
+            except Exception as e:
                 writer.writerow([datetime.now().isoformat(), nome, isin, "ERRORE", ""])
-            print(f"{nome} ({isin}): errore {repr(e)}")
+                print(f"{nome} ({isin}): errore {repr(e)}")
 
 if __name__ == "__main__":
     main()
