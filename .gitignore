@@ -41,5 +41,7 @@ Thumbs.db
 *.swp
 *.tmp
 
-# TXT files
+# TXT & CSV files
 *.txt
+*.csv
+!data/*.csv
