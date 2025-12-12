@@ -93,10 +93,15 @@ def normalize(value_it):
 # Main
 # -----------------------------
 def main():
-    # Legge lista fondi da CSV (nome,url,ISIN)
+    # Legge lista fondi da CSV (nome,url,ISIN) con normalizzazione intestazioni/valori
+    fondi = []
     with open(fondi_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        fondi = list(reader)
+        # Normalizza intestazioni (rimuove spazi e BOM)
+        reader.fieldnames = [fn.strip().lstrip("\ufeff") for fn in reader.fieldnames]
+        for row in reader:
+            clean_row = {k.strip(): (v.strip() if isinstance(v, str) else "") for k, v in row.items()}
+            fondi.append(clean_row)
 
     # Inizializza output
     with open(fondi_nav_path, "w", newline="", encoding="utf-8") as f_out:
@@ -105,9 +110,9 @@ def main():
 
     # Loop sui fondi
     for fondo in fondi:
-        nome = fondo["nome"].strip()
-        url = fondo["url"].strip()
-        isin = fondo.get("ISIN", "").strip()  # può essere vuoto o "IT"
+        nome = fondo.get("nome", "")
+        url = fondo.get("url", "")
+        isin = fondo.get("ISIN", "")
         try:
             html = fetch_html(url)
             if not html:
