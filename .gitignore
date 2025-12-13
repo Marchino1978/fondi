@@ -44,4 +44,6 @@ Thumbs.db
 # TXT & CSV files
 *.txt
 *.csv
+
+# exceptions
 !data/*.csv
